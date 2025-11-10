@@ -1,0 +1,63 @@
+[build-system]
+requires = ["briefcase"]
+
+[tool.briefcase]
+project_name = "Survey"
+bundle = "org.example.survey"
+version = "0.0.1"
+url = "https://github.com/YOUR_USERNAME/Survey_App"
+license = "BSD"
+author = "Your Name"
+author_email = "your.email@example.com"
+
+[tool.briefcase.app.survey_app]
+formal_name = "Survey"
+description = "A mobile survey app"
+sources = ["survey_app"]
+app_module = "survey_app"
+app_factory = "main"
+requires = [
+    "Pillow>=9.0.0",
+]
+
+[tool.briefcase.app.survey_app.android]
+requires = [
+    "toga-android>=0.3.0",
+    "Pillow>=9.0.0",
+]
+supported_versions = ["10", "11", "12", "13"]
+permissions = []
+
+[tool.briefcase.app.survey_app.iOS]
+requires = [
+    "toga-iOS>=0.3.0",
+]
+supported_versions = ["13.4", "14.0", "15.0", "16.0"]
+permissions = []
+
+[tool.briefcase.app.survey_app.macOS]
+requires = [
+    "toga-cocoa>=0.3.0",
+]
+supported_versions = ["10.14", "10.15", "11.0", "12.0", "13.0"]
+permissions = []
+
+[tool.briefcase.app.survey_app.linux]
+requires = [
+    "toga-gtk>=0.3.0",
+]
+supported_versions = ["18.04", "20.04", "22.04", "23.04"]
+permissions = []
+
+[tool.briefcase.app.survey_app.windows]
+requires = [
+    "toga-winforms>=0.3.0",
+]
+supported_versions = ["10", "11"]
+permissions = []
+
+[tool.briefcase.app.survey_app.web]
+requires = [
+    "toga-web>=0.3.0",
+]
+

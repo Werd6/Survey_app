@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TruthWeb</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+        #graphCanvas {
+            width: 100%;
+            height: 100vh;
+            display: block;
+            touch-action: pan-x pan-y;
+        }
+        #legend {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div id="legend">
+        🔴 Contradictions | 🟢 Requirements<br>
+        🔵 Agreed | ⚪ Disagreed/Unanswered
+    </div>
+    <canvas id="graphCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawGraph();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        // Get graph data from embedded script tag
+        const graphDataScript = document.getElementById('graphData');
+        if (!graphDataScript) {
+            console.error('Graph data not found');
+            return;
+        }
+        
+        let graphData;
+        try {
+            graphData = JSON.parse(graphDataScript.textContent);
+        } catch (e) {
+            console.error('Failed to parse graph data:', e);
+            return;
+        }
+        
+        const { nodes, contradictions, requirements } = graphData;
+        
+        function drawGraph() {
+            if (!nodes || nodes.length === 0) {
+                return;
+            }
+            
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Calculate node positions in circle
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) * 0.35;
+            const nodeRadius = 30;
+            
+            const nodePositions = [];
+            nodes.forEach((node, i) => {
+                const angle = (2 * Math.PI * i / nodes.length) - Math.PI / 2;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                nodePositions.push({ x, y, node });
+            });
+            
+            // Draw connections (edges) first so they appear behind nodes
+            // Draw contradictions in red
+            if (contradictions) {
+                contradictions.forEach((edge) => {
+                    const i = edge[0];
+                    const j = edge[1];
+                    if (i < nodePositions.length && j < nodePositions.length) {
+                        const pos1 = nodePositions[i];
+                        const pos2 = nodePositions[j];
+                        ctx.strokeStyle = '#d32f2f';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.moveTo(pos1.x, pos1.y);
+                        ctx.lineTo(pos2.x, pos2.y);
+                        ctx.stroke();
+                    }
+                });
+            }
+            
+            // Draw requirements in green
+            if (requirements) {
+                requirements.forEach((edge) => {
+                    const i = edge[0];
+                    const j = edge[1];
+                    if (i < nodePositions.length && j < nodePositions.length) {
+                        const pos1 = nodePositions[i];
+                        const pos2 = nodePositions[j];
+                        ctx.strokeStyle = '#388e3c';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.moveTo(pos1.x, pos1.y);
+                        ctx.lineTo(pos2.x, pos2.y);
+                        ctx.stroke();
+                    }
+                });
+            }
+            
+            // Draw nodes
+            nodePositions.forEach(({ x, y, node }) => {
+                // Node color based on status
+                let fillColor = '#e0e0e0'; // Light gray for unanswered
+                let strokeColor = '#999999';
+                
+                if (node.answered) {
+                    if (node.agreed) {
+                        fillColor = '#4a90e2'; // Blue for agreed
+                        strokeColor = '#2d5aa0';
+                    } else {
+                        fillColor = '#cccccc'; // Gray for disagreed
+                        strokeColor = '#888888';
+                    }
+                }
+                
+                // Draw circle
+                ctx.fillStyle = fillColor;
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.stroke();
+                
+                // Draw question number
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`Q${node.index + 1}`, x, y);
+            });
+        }
+        
+        // Initial draw
+        drawGraph();
+    </script>
+    <script id="graphData" type="application/json">
+        {"nodes":[],"contradictions":[],"requirements":[]}
+    </script>
+</body>
+</html>
+
