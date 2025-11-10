@@ -11,60 +11,54 @@ A mobile survey app built with BeeWare (Toga) that supports multiple question se
 - **Persistent Storage**: Answers are saved locally and persist across app restarts
 - **Interactive Graph**: Click on nodes in the TruthWeb to see question details
 
-## Run with BeeWare (recommended)
+## Building and Running
 
-1. Install prerequisites (macOS):
-   - Xcode (for iOS), Android Studio (for Android)
-   - Python 3.10–3.12
-   - `pipx`: `python3 -m pip install --user pipx && pipx ensurepath`
-   - `briefcase`: `pipx install briefcase`
+### Prerequisites
+- Python 3.10–3.12
+- `pipx`: `python3 -m pip install --user pipx && pipx ensurepath`
+- `briefcase`: `pipx install briefcase`
+- Android Studio (for Android builds)
 
-2. Create a new Briefcase app skeleton:
-   ```bash
-   briefcase new
-   ```
-   - Choose a Toga app
-   - Fill in metadata (App Name: Survey, Bundle: org.example, Formal Name: Survey, etc.)
+### Build for Android
 
-3. Copy this repo's `src/survey_app/` into the generated project's `src/<your_app_package>/` (or rename the package there to `survey_app`). Ensure the `main()` in `src/survey_app/__init__.py` is used by `pyproject.toml` as the app factory.
+```bash
+# Create Android project
+briefcase create android
 
-4. Run locally for desktop preview:
-   ```bash
-   briefcase dev
-   ```
+# Build APK
+briefcase build android
 
-5. Android build:
-   ```bash
-   briefcase create android
-   briefcase build android
-   briefcase run android
-   ```
+# Run on emulator or device
+briefcase run android
+```
 
-6. iOS build:
-   ```bash
-   briefcase create iOS
-   # Then open the Xcode project generated under `iOS/` and run
-   ```
+### Run locally (desktop preview)
+
+```bash
+briefcase dev
+```
 
 ## Source layout
 
-- `src/survey_app/__init__.py` — `main()` returning `SurveyApp`
-- `src/survey_app/app.py` — UI, controller, persistence wiring
-- `src/survey_app/questions.py` — hardcoded questions list
-- `src/survey_app/storage.py` — JSON load/save helpers
+- `survey_app/__init__.py` — `main()` returning `SurveyApp`
+- `survey_app/app.py` — UI, controller, persistence wiring, contradiction resolution
+- `survey_app/questions.py` — Question sets with relationships (contradicts, requires)
+- `survey_app/storage.py` — JSON load/save helpers
+- `survey_app/truth_web.py` — TruthWeb visualization (deprecated, now in app.py)
 
 ## Data format
 
-Answers are stored at `app.paths.data / responses.json` as:
+Answers are stored per question set at `app.paths.data / responses_{question_set_name}.json` as:
 ```json
 {
-  "q1": ["Cats are better than dogs", true],
-  "q2": ["Pineapple belongs on pizza", false]
+  "q1": ["Question text", true],
+  "q2": ["Question text", false]
 }
 ```
 
 ## Notes
-- To change questions, edit `src/survey_app/questions.py`.
-- Use the Results screen’s Restart button to clear saved answers.
 
-
+- To add new question sets, edit `survey_app/questions.py` and add to `QUESTION_SETS` dictionary
+- To modify questions, edit `survey_app/questions.py`
+- Use the Results screen's Restart button to clear saved answers
+- The TruthWeb visualization shows contradictions as red lines and requirements as green lines
