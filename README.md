@@ -1,6 +1,15 @@
-# BeeWare Survey App (Toga)
+# Survey App - Mobile Question & Answer App
 
-This repo contains the core source files for a BeeWare (Toga) mobile survey app. It shows one agree/disagree question at a time, saves answers locally across restarts, and displays results after completion.
+A mobile survey app built with BeeWare (Toga) that supports multiple question sets, tracks contradictions and requirements between answers, and provides a TruthWeb visualization.
+
+## Features
+
+- **Multiple Question Sets**: Select from different question sets (e.g., Superheroes, Food)
+- **Contradiction Detection**: Automatically detects when you agree with contradictory statements
+- **Contradiction Resolution**: Interactive flow to resolve contradictory answers
+- **TruthWeb Visualization**: Graphical representation of your answers showing contradictions (red) and requirements (green)
+- **Persistent Storage**: Answers are saved locally and persist across app restarts
+- **Interactive Graph**: Click on nodes in the TruthWeb to see question details
 
 ## Run with BeeWare (recommended)
 
